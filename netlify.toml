@@ -1,0 +1,19 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Keep frontend calling /api/... and send it to the single "api" function.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/api/:splat"
+  status = 200
+
+# SPA fallback (optional: Netlify already serves index.html for 404 if configured)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+

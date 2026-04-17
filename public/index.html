@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta name="theme-color" content="#0f766e" />
+    <title>Roster RT-UT</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-grid"></div>
+
+    <header class="topbar">
+      <div class="topbar-inner">
+        <p class="eyebrow">Calidad</p>
+        <div class="title-action-row">
+          <h1>Planificacion personal de sitio</h1>
+          <nav class="portal-access" aria-label="Areas del sistema">
+            <button type="button" class="portal-tab is-active" data-area-tab="planificacion">
+              Planificacion Roster
+            </button>
+            <button type="button" class="portal-tab" data-area-tab="comunicacion">Difusion</button>
+            <button type="button" class="portal-tab" data-area-tab="kpi">KPI Personal</button>
+          </nav>
+        </div>
+        <p class="subtitle">Definir roster, editar turnos y exportar Excel.</p>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel controls">
+        <p id="importMsg" class="muted" hidden></p>
+
+        <div class="controls-sections">
+          <section class="control-section control-section-roster" data-area-section="planificacion">
+            <div class="control-section-head">
+              <h3>Definir Roster</h3>
+            </div>
+
+            <div class="filters filters-main">
+              <label>
+                Mes
+                <select id="monthInput">
+                  <option value="">Seleccionar mes</option>
+                </select>
+              </label>
+              <div class="personal-filter">
+                <div class="personal-filter-head">
+                  <label for="calendarEmployeeInput">Personal</label>
+                  <button id="clearCalendarEmployeeFilterBtn" type="button" class="ghost-btn">
+                    Mostrar todas
+                  </button>
+                </div>
+                <select id="calendarEmployeeInput" multiple size="8"></select>
+              </div>
+              <label class="search-control">
+                Buscar
+                <input id="searchInput" type="text" placeholder="Nombre, DNI, categoria..." />
+              </label>
+            </div>
+
+            <div class="hidden-controls" aria-hidden="true">
+              <input id="fromInput" type="hidden" />
+              <input id="toInput" type="hidden" />
+              <select id="categoriaInput" hidden><option value="">Todas</option></select>
+              <select id="residenciaInput" hidden><option value="">Todas</option></select>
+              <select id="grupoInput" hidden><option value="">Todos</option></select>
+            </div>
+
+            <label class="fit-toggle">
+              <input id="fitDaysInput" type="checkbox" checked />
+              Ajustar todos los dias en la grilla
+            </label>
+
+            <div id="codeMeaning" class="code-meaning" aria-label="Leyenda de codigos"></div>
+
+          </section>
+
+          <section
+            class="control-section control-section-comms"
+            data-area-section="comunicacion"
+          >
+            <div class="control-section-head">
+              <h3>Difusion WPP / Email</h3>
+            </div>
+            <section class="notify-box">
+              <h3>Notificacion WPP / Email</h3>
+              <div class="notify-grid">
+                <label>
+                  Desde
+                  <input id="alertFromInput" type="date" />
+                </label>
+                <label>
+                  Hasta
+                  <input id="alertToInput" type="date" />
+                </label>
+              </div>
+              <div class="notify-actions pill-tabs">
+                <a id="emailLink" class="pill-tab is-active" href="#">Abrir Email</a>
+              </div>
+              <pre id="alertPreview" class="alert-preview">Genera una vista previa para enviar.</pre>
+            </section>
+          </section>
+
+          <section class="control-section control-section-kpi" data-area-section="kpi">
+            <div class="control-section-head">
+              <h3>KPI Personal En Sitio</h3>
+            </div>
+            <section class="up-people-box" aria-live="polite">
+              <h3>Personal Arriba</h3>
+              <div class="up-people-controls">
+                <label>
+                  Mes y fecha
+                  <select id="upDateInput">
+                    <option value="">Seleccionar fecha</option>
+                  </select>
+                </label>
+                <label>
+                  Codigos en sitio
+                  <input
+                    id="onsiteCodesInput"
+                    type="text"
+                    value="1"
+                    placeholder="Ej: 1"
+                    inputmode="text"
+                  />
+                </label>
+              </div>
+              <p id="upPeopleMeta" class="muted">Sin datos para mostrar.</p>
+              <div id="onsiteMetrics" class="onsite-metrics"></div>
+              <ul id="upPeopleList" class="up-people-list"></ul>
+            </section>
+          </section>
+        </div>
+      </section>
+
+      <section class="panel summary">
+        <h2>Resumen</h2>
+        <div id="summaryCards" class="summary-cards"></div>
+        <div class="legend">
+          <h3>Codigos de Turno</h3>
+          <p id="codeLegend" class="muted">Sin datos</p>
+          <p class="muted small">
+            Tip: click en una celda para rotar codigo, Shift+click para limpiar rapido.
+          </p>
+        </div>
+
+        <div class="profile-box">
+          <h3>Ficha Personal</h3>
+          <label>
+            Seleccionar persona
+            <select id="profileEmployeeInput">
+              <option value="">Elegir persona</option>
+            </select>
+          </label>
+          <div id="profileCard" class="profile-card">Selecciona una persona para ver su ficha.</div>
+        </div>
+      </section>
+
+      <section class="panel conflicts">
+        <h2>Alertas</h2>
+        <div class="conflict-header">
+          <label>
+            Cobertura minima en sitio
+            <input id="coverageInput" type="number" min="0" step="1" value="2" />
+          </label>
+          <button id="refreshConflictsBtn" class="ghost-btn">Revisar</button>
+        </div>
+        <ul id="conflictsList" class="conflicts-list"></ul>
+      </section>
+
+      <section class="panel roster" data-area-section="planificacion">
+        <div class="roster-actions">
+          <a id="downloadBtn" class="primary-btn section-export-btn" href="#">Exportar Excel</a>
+        </div>
+        <div class="roster-topbar">
+          <h2 class="roster-title">PERSONAL</h2>
+          <div class="month-nav month-nav-calendar">
+            <button id="prevMonthBtn" class="ghost-btn" type="button">Mes anterior</button>
+            <button id="nextMonthBtn" class="ghost-btn" type="button">Mes siguiente</button>
+          </div>
+        </div>
+        <div id="rosterTableWrap" class="table-wrap"></div>
+        <p id="tableMeta" class="muted roster-meta-bottom"></p>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

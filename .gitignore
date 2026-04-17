@@ -1,0 +1,11 @@
+node_modules/
+uploads/
+data/store.json
+npm-debug.log*
+.env
+.env.*
+MOVIMIENTOS PERSONAL CALIDAD*.xlsx
+data/export-rrhh-*.xlsx
+data/export-test.xlsx
+data/style-test.xlsx
+data/template-roundtrip.xlsx
