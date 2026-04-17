@@ -2047,6 +2047,16 @@ app.post("/api/import-excel", upload.single("file"), async (req, res) => {
   }
 });
 
+// JSON error handler (important for Netlify Functions: avoids HTML 500 responses)
+app.use((err, _req, res, _next) => {
+  try {
+    console.error(err);
+  } catch (_) {
+    // ignore
+  }
+  res.status(500).json({ error: err?.message || "Error interno del servidor." });
+});
+
 app.get("/{*all}", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
