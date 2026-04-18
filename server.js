@@ -11,8 +11,16 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "0.0.0.0";
 
+const IS_SERVERLESS = Boolean(
+  process.env.NETLIFY || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT
+);
+
+// In Netlify/AWS Lambda the code directory is read-only (/var/task).
+// Use /tmp for any writes (uploads, temp files).
 const DATA_DIR = path.join(__dirname, "data");
-const UPLOADS_DIR = path.join(__dirname, "uploads");
+const UPLOADS_DIR = IS_SERVERLESS
+  ? path.join(os.tmpdir(), "roster-uploads")
+  : path.join(__dirname, "uploads");
 const STORE_PATH = path.join(DATA_DIR, "store.json");
 const EXPORT_TEMPLATE_CANDIDATES = [
   path.join(DATA_DIR, "export-template.xlsx"),
@@ -45,7 +53,10 @@ function getLanIps() {
 }
 
 function ensureDirs() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  // DATA_DIR may be read-only in serverless; only ensure when we need file backend.
+  if (!IS_SERVERLESS) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
