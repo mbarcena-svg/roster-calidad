@@ -948,12 +948,24 @@ function writeStoreSync(store) {
 }
 
 let _supabase;
+function cleanEnvValue(value) {
+  const trimmed = cleanText(value);
+  // Remove accidental wrapping quotes from copy/paste
+  if (
+    (trimmed.startsWith("\"") && trimmed.endsWith("\"")) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 function getSupabase() {
-  const url = process.env.SUPABASE_URL;
+  const url = cleanEnvValue(process.env.SUPABASE_URL);
   const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_KEY;
+    cleanEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY) ||
+    cleanEnvValue(process.env.SUPABASE_ANON_KEY) ||
+    cleanEnvValue(process.env.SUPABASE_KEY);
   if (!url || !key) {
     throw new Error(
       "Faltan variables de entorno de Supabase (SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY/ANON_KEY)."
@@ -1715,6 +1727,22 @@ app.get("/api/summary", async (_req, res) => {
     byCategoria,
     byResidencia,
     conflicts: conflicts.length,
+  });
+});
+
+app.get("/api/health", (_req, res) => {
+  const url = cleanEnvValue(process.env.SUPABASE_URL);
+  const key = cleanEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY);
+  const keyType = key.startsWith("sb_") ? "sb_*" : key.startsWith("eyJ") ? "jwt(eyJ...)" : key ? "other" : "missing";
+  res.json({
+    ok: true,
+    storeBackend: STORE_BACKEND,
+    serverless: IS_SERVERLESS,
+    supabaseUrlSet: Boolean(url),
+    supabaseUrlHost: url ? url.replace(/^https?:\/\//, "").split("/")[0] : null,
+    supabaseKeySet: Boolean(key),
+    supabaseKeyType: keyType,
+    supabaseKeyLen: key ? key.length : 0,
   });
 });
 
